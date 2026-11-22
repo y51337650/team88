@@ -1,0 +1,17 @@
+# 민감 의료 데이터 및 로컬 DB 파일 제외
+data/raw/*.csv
+data/raw/*.xlsx
+data/processed/*.csv
+*.db
+*.sqlite3
+
+# API 인증키 및 환경 변수 제외
+.env
+secrets.toml
+*api_key*
+
+# 파이썬 및 주피터 임시 파일 제외
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.DS_Store

@@ -1,0 +1,35 @@
+name: Daily Submission & Security Check
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  verify-submission:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout student code
+        uses: actions/checkout@v4
+
+      - name: 1. 민감 데이터(.csv, .env) 유출 여부 검사
+        run: |
+          if find . -name "*.env" -o -path "./data/raw/*.csv" | grep -q .; then
+            echo "❌ 오류: 민감 데이터 또는 환경변수 파일이 포함되었습니다. 삭제 후 다시 Push하세요."
+            exit 1
+          fi
+          echo "✅ 보안 검사 통과"
+
+      - name: 2. 일일 회고록(docs/daily_log.md) 작성 여부 검사
+        run: |
+          if [ ! -f "docs/daily_log.md" ]; then
+            echo "❌ 오류: docs/daily_log.md 파일이 없습니다."
+            exit 1
+          fi
+          CHAR_COUNT=$(wc -m < docs/daily_log.md)
+          if [ "$CHAR_COUNT" -lt 150 ]; then
+            echo "❌ 오류: 일일 회고록 내용이 너무 짧습니다 (현재 ${CHAR_COUNT}자 / 최소 150자 이상 작성)."
+            exit 1
+          fi
+          echo "✅ 일일 회고록 작성 확인 완료 (${CHAR_COUNT}자)"
